@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+
+export ZSH="$HOME/.oh-my-zsh"
+DISABLE_AUTO_TITLE="true"
+ZSH_THEME="ccob"
+plugins=(git)
+
+[[ -s $ZSH/oh-my-zsh.sh ]] && source "$ZSH/oh-my-zsh.sh"
+[[ -f $HOME/.fzf.zsh ]] && source "$HOME/.fzf.zsh"
+
+typeset -U path PATH
+path=("$HOME/.local/bin" $path)
+
+if (($+commands[zoxide])); then
+	eval "$(zoxide init zsh)"
+fi
+
+# Runtimes, SDKs, secrets and host-specific settings live here.
+[[ -f $HOME/.zshrc.local ]] && source "$HOME/.zshrc.local"
+
+if [[ -n ${HOMEBREW_PREFIX:-} ]]; then
+	[[ -f $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]] &&
+		source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+	[[ -f $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] &&
+		source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi

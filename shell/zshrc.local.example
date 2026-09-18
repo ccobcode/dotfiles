@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+# Host-specific runtimes, SDKs, secrets and proxy settings belong here.
+# [[ -f $HOME/.routerc ]] && source "$HOME/.routerc"
+# export SDK_HOME="/ABSOLUTE/SDK/PATH"
