@@ -26,7 +26,9 @@ exec zsh
 
 Existing files are moved to `~/.dotfiles-backup/TIMESTAMP/` before links are
 created. Project and production dependencies are intentionally excluded.
-`--packages` also installs the pinned personal Agent Skills.
+`--packages` also installs the pinned personal Agent Skills. The installer
+changes the login shell to Zsh only when needed. Existing tmux panes keep their
+current process; run `exec zsh` once or open a new pane after installation.
 
 Copy `shell/zshrc.local.example` to `~/.zshrc.local` for secrets, SDK paths and
 host-specific settings. Copy `git/gitconfig.local.example` to

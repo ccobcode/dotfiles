@@ -97,5 +97,27 @@ if [[ -d $skills_checkout/skills ]]; then
 	done
 fi
 
-print 'dotfiles linked; run: exec zsh'
+login_user=$(id -un)
+zsh_path=${commands[zsh]}
+case $OSTYPE in
+darwin*) login_shell=$(dscl . -read "/Users/$login_user" UserShell | awk '{print $2}') ;;
+linux*) login_shell=$(getent passwd "$login_user" | cut -d: -f7) ;;
+esac
+
+if [[ ${login_shell:t} != zsh ]]; then
+	if ((EUID == 0)); then
+		chsh -s "$zsh_path" "$login_user"
+	elif (($+commands[sudo])); then
+		sudo chsh -s "$zsh_path" "$login_user"
+	else
+		chsh -s "$zsh_path"
+	fi
+	print "default shell changed: $login_shell -> $zsh_path"
+fi
+
+if (($+commands[tmux])) && tmux has-session 2>/dev/null; then
+	tmux set-option -g default-shell "$zsh_path"
+fi
+
+print 'dotfiles linked; start a new login shell or run: exec zsh'
 [[ -d $backup_root ]] && print "backup: $backup_root"

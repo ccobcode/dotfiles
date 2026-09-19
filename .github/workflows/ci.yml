@@ -8,8 +8,11 @@ permissions:
   contents: read
 
 jobs:
-  ubuntu:
-    runs-on: ubuntu-latest
+  install:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
       - name: Install
@@ -28,6 +31,11 @@ jobs:
         run: |
           zsh -n "$DOTFILES_DIR"/install.zsh "$DOTFILES_DIR"/shell/*.zsh "$DOTFILES_DIR"/shell/themes/*.zsh-theme
           zsh "$DOTFILES_DIR/install.zsh"
-          test "$(readlink -f "$HOME/.zshrc")" = "$DOTFILES_DIR/shell/zshrc"
+          test "$(readlink "$HOME/.zshrc")" = "$DOTFILES_DIR/shell/zshrc"
           grep -q existing "$HOME"/.dotfiles-backup/*/.zshrc
           TERM=xterm-256color zsh -lic 'command -v fzf; command -v zoxide'
+          case "$(uname -s)" in
+            Darwin) login_shell=$(dscl . -read "/Users/$(id -un)" UserShell | awk '{print $2}') ;;
+            Linux) login_shell=$(getent passwd "$(id -un)" | cut -d: -f7) ;;
+          esac
+          test "${login_shell##*/}" = zsh
