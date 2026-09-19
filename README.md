@@ -1,20 +1,25 @@
 # ccob dotfiles
 
-Portable shell and tooling preferences for macOS.
+Portable shell and tooling preferences for macOS and Ubuntu.
 
 ## Install
 
-On this machine, link the tracked configuration:
+Install from GitHub; this installs the preferred packages and links the
+configuration without a manual clone:
 
-```zsh
-./install.zsh
+```sh
+curl -fsSL https://raw.githubusercontent.com/ccobcode/dotfiles/main/install.sh | bash
 exec zsh
 ```
 
-On a new Mac with Homebrew installed, restore the preferred interactive-shell
-tools and links:
+The remote installer uses `~/.dotfiles` by default and updates an existing
+checkout with a fast-forward pull. On macOS, Homebrew must already be installed;
+on Ubuntu, required packages are installed with APT.
+
+From an existing checkout, link only or install packages plus links:
 
 ```zsh
+./install.zsh
 ./install.zsh --packages
 exec zsh
 ```
@@ -31,7 +36,7 @@ Git.
 ## Layout
 
 ```text
-Brewfile                 portable shell baseline
+Brewfile                 macOS shell baseline
 agents/                  shared Codex, Claude and OpenCode preferences
 git/                     portable Git identity
 shell/                   zsh startup files and theme
@@ -43,6 +48,6 @@ Project-local conventions remain in each project and override these defaults.
 ## Implementation
 
 The repository deliberately uses a small native stack: Git for versioning, Zsh
-and Oh My Zsh for the shell, Homebrew Bundle for four preferred shell helpers,
-and an idempotent Zsh script for backup plus symbolic links. It does not depend
-on Stow, Chezmoi, Nix or another dotfile manager.
+and Oh My Zsh for the shell, Homebrew Bundle or APT for four preferred shell
+helpers, and an idempotent Zsh script for backup plus symbolic links. It does
+not depend on Stow, Chezmoi, Nix or another dotfile manager.

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install
+        env:
+          DOTFILES_DIR: ${{ runner.temp }}/dotfiles
+          DOTFILES_REPOSITORY: file://${{ github.workspace }}
+          HOME: ${{ runner.temp }}/home
+        run: |
+          mkdir -p "$HOME"
+          printf 'existing\n' > "$HOME/.zshrc"
+          bash ./install.sh
+      - name: Verify
+        env:
+          DOTFILES_DIR: ${{ runner.temp }}/dotfiles
+          HOME: ${{ runner.temp }}/home
+        run: |
+          zsh -n "$DOTFILES_DIR"/install.zsh "$DOTFILES_DIR"/shell/*.zsh "$DOTFILES_DIR"/shell/themes/*.zsh-theme
+          zsh "$DOTFILES_DIR/install.zsh"
+          test "$(readlink -f "$HOME/.zshrc")" = "$DOTFILES_DIR/shell/zshrc"
+          grep -q existing "$HOME"/.dotfiles-backup/*/.zshrc
+          TERM=xterm-256color zsh -lic 'command -v fzf; command -v zoxide'

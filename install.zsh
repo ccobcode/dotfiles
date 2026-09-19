@@ -16,11 +16,37 @@ case ${1:-} in
 esac
 
 if $install_packages; then
-	if ! (($+commands[brew])); then
-		print -u2 'Homebrew is required: https://brew.sh'
+	case $OSTYPE in
+	darwin*)
+		if ! (($+commands[brew])); then
+			print -u2 'Homebrew is required: https://brew.sh'
+			exit 1
+		fi
+		HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle --file="$root/Brewfile"
+		;;
+	linux*)
+		[[ -r /etc/os-release ]] && source /etc/os-release
+		if [[ ${ID:-} != ubuntu ]]; then
+			print -u2 "unsupported Linux distribution: ${ID:-unknown}"
+			exit 1
+		fi
+		if ((EUID == 0)); then
+			sudo=()
+		elif (($+commands[sudo])); then
+			sudo=(sudo)
+		else
+			print -u2 'sudo is required to install packages'
+			exit 1
+		fi
+		"${sudo[@]}" apt-get update
+		"${sudo[@]}" env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+			ca-certificates fzf git zoxide zsh zsh-autosuggestions zsh-syntax-highlighting
+		;;
+	*)
+		print -u2 "unsupported operating system: $OSTYPE"
 		exit 1
-	fi
-	HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle --file="$root/Brewfile"
+		;;
+	esac
 
 	if [[ ! -d $HOME/.oh-my-zsh ]]; then
 		git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"
